@@ -1,0 +1,72 @@
+/* Navbar Styling */
+.navbar {
+    background-color: #173d5a; /* Blue background */
+    padding: 10px 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    
+  }
+  
+  .navbar-brand {
+    display: flex;
+    align-items: center;
+    color: white;
+    font-size: 2rem;
+    font-weight: bold;
+    text-decoration:wavy;
+  }
+  
+  .navbar-brand img {
+    width: 40px;  /* Adjust this size as per your logo */
+    height: 40px;
+    margin-right: 10px;
+    border-radius: 50%; /* Circular logo */
+  }
+  
+  .navbar-nav {
+    /* margin-right: auto; */
+    margin-left: 60rem;
+  }
+  
+  .nav-item {
+    list-style: none;
+    display: inline-block;
+    margin-left: 20px;
+   
+  }
+  
+  .nav-link {
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+  
+  .nav-link:hover {
+    color: #f1f1f1; /* Slightly lighter color on hover */
+  }
+  
+  .nav-link:focus {
+    outline: none;
+  }
+  
+  .navbar-toggler {
+    border: none;
+  }
+  
+  /* Mobile View */
+  @media (max-width: 768px) {
+    .navbar {
+      padding: 10px;
+    }
+  
+    .navbar-nav {
+      display: block;
+      text-align: right;
+    }
+  
+    .nav-item {
+      margin: 10px 0;
+    }
+  }
+  

@@ -1,10 +1,13 @@
 /* Container Styles */
 .container {
-    max-width: 600px;
-    margin: auto;
+    max-width: 500px;
+    /* margin: auto; */
+    /* align-self: center; */
     padding: 20px;
+    padding-left: 10rem;
+    padding-right: 10rem;
     background-color: #f9f9f9;
-    border-radius: 8px;
+    border-radius: 15px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   }
   
@@ -13,16 +16,18 @@
     color: #333;
     font-size: 24px;
     font-weight: bold;
+    padding-left: 4rem;
+    padding-right: 4rem;
     margin-bottom: 20px;
   }
   
-  /* Form Group Styling */
+
   .form-group {
     margin-bottom: 15px;
   }
   
   .form-control {
-    width: 100%;
+    /* width: 100%; */
     padding: 10px;
     font-size: 16px;
     border: 1px solid #ddd;
@@ -36,7 +41,6 @@
     outline: none;
   }
   
-  /* Button Styles */
   .btn {
     background-color: #007bff;
     color: white;
@@ -57,7 +61,6 @@
     background-color: #0056b3;
   }
   
-  /* Result Display Styles */
   #prediction {
     font-size: 18px;
     color: #333;
@@ -70,7 +73,6 @@
     margin-top: 10px;
   }
   
-  /* Loader Spinner Styles */
   .spinner-border {
     width: 2rem;
     height: 2rem;
