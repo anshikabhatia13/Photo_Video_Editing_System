@@ -131,18 +131,16 @@ const Form = () => {
             </div>
           )}
 
-          {/* Display Result (Could be image or video) */}
+          {/* Display Result (Video Output) */}
           {resultURL && (
             <div className="text-center mt-4">
               <h4>Predicted Output:</h4>
-              {formData.videoFile ? (
-                <video controls width="500">
-                  <source src={resultURL} type="video/mp4" />
-                  Your browser does not support the video tag.
-                </video>
-              ) : (
-                <img src={resultURL} alt="Processed Output" width="500" />
-              )}
+              <video controls width="500">
+                <source src={resultURL} type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+              {/* Add a portion of the video output */}
+              <p>Part of the processed video is displayed here</p>
             </div>
           )}
         </div>
