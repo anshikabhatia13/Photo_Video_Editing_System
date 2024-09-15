@@ -1,121 +1,120 @@
+import subprocess
 from flask import Flask, request, jsonify, send_file
 import os
-import torch
-import ruamel.yaml
-from torchvision.io import read_video
-from PIL import Image
-import shutil
-import numpy as np
-import torchvision.transforms.functional as Func
-import torchvision.transforms as T
-import torch.nn.functional as F
-from NeurIPS2023_SOC.models import build_model
-from NeurIPS2023_SOC.datasets.transforms import RandomResize
-import NeurIPS2023_SOC.misc as utils
+import uuid
 
 app = Flask(__name__)
 
-size_transform = RandomResize(sizes=[360], max_size=640)
-transform = T.Compose([
-    T.ToTensor(),
-    T.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-])
+# Directory paths for uploads and output
+UPLOAD_DIR = 'uploads'
+OUTPUT_DIR = 'output'
 
-def vis_add_mask(img, mask, color):
-    source_img = np.asarray(img).copy()
-    origin_img = np.asarray(img).copy()
-    color = np.array(color)
+# Ensure the necessary directories exist
+def ensure_directories():
+    if not os.path.exists(UPLOAD_DIR):
+        os.makedirs(UPLOAD_DIR)
+    if not os.path.exists(OUTPUT_DIR):
+        os.makedirs(OUTPUT_DIR)
 
-    mask = mask.reshape(mask.shape[0], mask.shape[1]).astype('uint8')
-    mask = mask > 0.5
+# Generate a unique filename for the uploaded video
+def generate_unique_filename(filename):
+    extension = os.path.splitext(filename)[1]  # Get the file extension (e.g., '.mp4')
+    unique_filename = str(uuid.uuid4()) + extension  # Create a unique filename
+    return unique_filename
 
-    origin_img[mask] = origin_img[mask] * 0.5 + color * 0.5
-    origin_img = Image.fromarray(origin_img)
-    source_img = Image.fromarray(source_img)
-    mask = Image.fromarray(mask)
-    return origin_img, source_img, mask
+# Construct the command to run the demo_video.py script
+def construct_command(video_filename, text_input):
+    config_path = 'NeurIPS2023_SOC/configs/refer_youtube_vos.yaml'
+    backbone = 'video-swin-b'
+    backbone_pretrained_path = 'NeurIPS2023_SOC/pretrained_weights/model.pth'
+    checkpoint_path = 'NeurIPS2023_SOC/checkpoint/joint_tiny.tar'
+    running_mode = 'test'
+    device = 'cuda'  # or 'cpu' depending on your setup
 
+    # Output directory for the processed video and frames
+    output_video_dir = os.path.join(OUTPUT_DIR, video_filename.split('.')[0])
+    command = [
+        'cmd.exe', '/C',
+        'cd .. && '
+        'C:/Users/anshi/Desktop/DMLS_PRoj/.venv/Scripts/activate.bat && '
+        'cd backend && '
+        'python NeurIPS2023_SOC/demo_video.py '
+        '-c NeurIPS2023_SOC/configs/refer_youtube_vos.yaml '
+        '-rm test '
+        '--backbone video-swin-b '
+        '-bpp NeurIPS2023_SOC/pretrained_weights/model.pth '
+        '-ckpt NeurIPS2023_SOC/checkpoint/joint_tiny.tar '
+        f'--video_dir {os.path.join(UPLOAD_DIR, video_filename)} '
+        '--device cuda '
+        f'--text "{text_input}"'
+    ]
+
+   
+#     command = [
+#     'cmd.exe', '/C',  # Run in cmd.exe shell
+   
+#     'C:/Users/anshi/Desktop/DMLS_PRoj/.venv/Scripts/activate.bat && python NeurIPS2023_SOC/demo_video.py',  
+#     '-c', config_path,
+#     '-rm', running_mode,
+#     '--backbone', backbone,
+#     '-bpp', backbone_pretrained_path,
+#     '-ckpt', checkpoint_path,
+#     '--video_dir', os.path.join(UPLOAD_DIR, video_filename),  # Input video path
+#     '--device', device,
+#     '--text', text_input  # Text input passed from frontend
+# ]
+
+
+    print(f"Constructed command: {' '.join(command)}")  # Debugging statement
+    return command, output_video_dir
+
+# Process the video using the demo_video.py script
+def process_video_with_script(video_filename, text_input):
+    command, output_video_dir = construct_command(video_filename, text_input)
+    try:
+        # Run the command and capture the output
+        result = subprocess.run(command, check=True, capture_output=True, text=True)
+        print(f"Script output: {result.stdout}")  # Debugging statement
+        return output_video_dir
+    except subprocess.CalledProcessError as e:
+        print(f"Error occurred: {e.stderr}")  # Debugging statement
+        raise
+
+# API endpoint to handle video and text input from the frontend
 @app.route('/process_video', methods=['POST'])
 def process_video():
-    if 'video' not in request.files:
-        return jsonify({"error": "No video uploaded"}), 400
-    if 'text' not in request.form:
-        return jsonify({"error": "No text provided"}), 400
+    try:
+        # Get the video file and text input from the request
+        video_file = request.files['video']  # Assuming the frontend sends a video file
+        text_input = request.form['text']  # Assuming the frontend sends a text input
 
-    # Get the uploaded video and the accompanying text
-    video_file = request.files['video']
-    text_input = request.form['text']
-    
-    # Save the uploaded video to a temporary location
-    video_path = os.path.join('./uploads', video_file.filename)
-    video_file.save(video_path)
+        # Generate a unique filename for the uploaded video
+        unique_video_filename = generate_unique_filename(video_file.filename)
+        video_filepath = os.path.join(UPLOAD_DIR, unique_video_filename)
 
-    # Load config file
-    config_path = 'NeurIPS2023_SOC/configs/refer_youtube_vos.yaml'
-    with open(config_path) as f:
-        config = ruamel.yaml.safe_load(f)
-    config = {k: v['value'] for k, v in config.items()}
+        # Save the video file to the uploads directory
+        video_file.save(video_filepath)
+        print(f"Video saved to {video_filepath}")  # Debugging statement
 
-    config['device'] = 'cuda' if torch.cuda.is_available() else 'cpu'
-    config['video_dir'] = video_path
-    config['checkpoint_path'] = './checkpoints/model_checkpoint.pth' 
+        # Process the video using the demo_video.py script
+        output_video_dir = process_video_with_script(unique_video_filename, text_input)
 
-    # Process video using the model, passing the text input
-    result_path = process_video_with_model(config, text_input)
-    
-    return send_file(result_path, mimetype='image/png')
+        # Check if output exists and pack frames as zip or return video
+        output_video_file = os.path.join(output_video_dir, 'SOC', 'visual', '0.png')  # Example path to first frame
 
+        if not os.path.exists(output_video_file):
+            return jsonify({"status": "error", "message": "Output video or frames not found"}), 500
 
-def process_video_with_model(config, text_input):
-    model, _, _ = build_model(config)
-    device = config['device']
-    model.to(device)
+        print(f"Sending output video or frames from {output_video_dir}")  # Debugging statement
 
-    checkpoint = torch.load(config['checkpoint_path'], map_location='cpu')
-    state_dict = checkpoint["model_state_dict"]
-    model.load_state_dict(state_dict, strict=False)
+        # Send the output video/frame as a response to the frontend
+        return send_file(output_video_file, as_attachment=True, mimetype='image/png')
 
-    model.eval()
-    
-
-    video_frames, _, _ = read_video(config['video_dir'], pts_unit='sec')
-    source_frames = []
-    imgs = []
-
-    for i in range(0, len(video_frames), 5):
-        source_frame = Func.to_pil_image(video_frames[i].permute(2, 0, 1))
-        source_frames.append(source_frame)
-
-    for frame in source_frames:
-        origin_w, origin_h = frame.size
-        img, _ = size_transform(frame)
-        imgs.append(transform(img))
-
-    frame_length = len(imgs)
-    imgs = torch.stack(imgs, dim=0)
-    samples = utils.nested_tensor_from_videos_list([imgs]).to(config['device'])
-
-    with torch.no_grad():
-        outputs = model(samples, None, [text_input], None)
-    
-    pred_masks = outputs["pred_masks"][:, 0, ...]
-    pred_masks = F.interpolate(pred_masks.unsqueeze(0), size=(origin_h, origin_w), mode='bilinear', align_corners=False)
-    pred_masks = (pred_masks.sigmoid() > 0.5).squeeze(0).cpu().numpy()
-
-    # Save output images
-    output_dir = './output'
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-    
-    color = [255, 144, 30]
-    result_path = os.path.join(output_dir, 'result.png')
-    origin_img, source_img, mask = vis_add_mask(source_frames[0], pred_masks[0], color)
-    origin_img.save(result_path)
-
-    return result_path
-
+    except Exception as e:
+        # Handle any errors that occur during processing
+        print(f"Error during processing: {str(e)}")  # Debugging statement
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 if __name__ == '__main__':
-    if not os.path.exists('./uploads'):
-        os.makedirs('./uploads')
+    ensure_directories()  # Ensure the upload and output directories exist
     app.run(debug=True)
