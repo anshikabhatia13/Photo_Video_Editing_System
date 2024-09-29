@@ -1,6 +1,6 @@
 # Referred Video Object Segmentation Web App
 
-This repository contains the code for a **Referred Video Object Segmentation** web application. The system allows users to upload a video and provide a text description, and it returns the video with the relevant object segmented. The app uses a **Swin UNetR** model for segmentation and is built with a **ReactJS** frontend and a **Flask** backend.
+This repository contains the code for a **Referred Video Object Segmentation** web application. The system allows users to upload a video and provide a text description, and it returns the video with the relevant object segmented. The app uses a **Swin UNetR** model for segmentation and is built with a **React Vite** frontend and a **Flask** backend.
 
 ## Features
 - **Video Upload & Text Input**: Users can upload a video and provide text for segmentation.
