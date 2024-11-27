@@ -1,6 +1,8 @@
 # Photo & Video Editing Web App
 
 This repository contains the code for a **Photo and Video Editing Web Application**. Users can upload photos or videos and apply editing tools such as background removal, object segmentation, and enhancement. The system utilizes deep learning models like **U^2Net**, **Swin UNetR**, and **U-Net** for performing these tasks. The app is built with a **React (Vite)** frontend and a **Flask** backend.
+## Documentation
+https://docs.google.com/document/d/18vM6KMFk_ggLlgySi4jCKJ5gUYyA01UK8SoF1rByZ0Q/edit?usp=sharing
 
 ## Features
 
