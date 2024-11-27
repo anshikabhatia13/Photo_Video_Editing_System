@@ -21,6 +21,9 @@ https://docs.google.com/document/d/18vM6KMFk_ggLlgySi4jCKJ5gUYyA01UK8SoF1rByZ0Q/
   - **U^2Net**: Image background removal.
   - **Swin UNetR**: Video object segmentation.
   - **U-Net**: Image segmentation.
+  - **YOLO-World**: Open-vocabulary real-time object detection with bounding box and class predictions.
+  - **Efficient SAM**: High-precision segmentation for pixel-level object masks.
+  - **Referring Video Object Segmentation (RVOS)**: Extendable for text-guided video-level object tracking and segmentation.
 - **Media Processing**: OpenCV, PyTorch.
 - **Deployment**: Docker, Nginx, Gunicorn.
 
