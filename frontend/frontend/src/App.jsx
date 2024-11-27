@@ -5,7 +5,9 @@ import Footer from "./components/Footer";
 import Header from "./components/Header";
 import Hero from "./components/Hero";
 import Unet from "./components/Unet";
+import CustomBackground from "./components/CustomBackground";
 import Form from "./components/Form";
+import ImageSegmentationForm from "./components/ImageSegmentationForm";
 
 
 const App = () => {
@@ -18,6 +20,8 @@ const App = () => {
         <Hero />
         <Benefits />
         <Unet/>
+        <CustomBackground/>
+        <ImageSegmentationForm/>
         <Form/>
         <Footer />
       </div>

@@ -1,12 +1,11 @@
 import React, { useState } from "react";
-import Arrow from "../assets/svg/Arrow"; // Assuming Arrow is used somewhere in your code.
 
 const Form = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     textInput: "",
     videoFile: null,
-    videoURL: null, // Store video URL to display it
+    videoURL: null,
   });
   const [resultURL, setResultURL] = useState(null);
   const [error, setError] = useState(null);
@@ -23,7 +22,7 @@ const Form = () => {
     setFormData({
       ...formData,
       videoFile: file,
-      videoURL: URL.createObjectURL(file), // Create object URL for the uploaded video
+      videoURL: URL.createObjectURL(file),
     });
     setResultURL(null);
   };
@@ -74,7 +73,7 @@ const Form = () => {
     <div
       className="App flex justify-center items-center min-h-screen"
       style={{
-        backgroundImage: "url('frontend/new_frontend/src/assets/otbg.jpg')", // Change image path here
+        backgroundImage: "url('frontend/new_frontend/src/assets/otbg.jpg')",
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
@@ -84,15 +83,21 @@ const Form = () => {
       <div
         className="form-box p-16 rounded-lg shadow-lg bg-slate-950 w-full max-w-7xl mx-4"
         style={{
-          borderTop: "13px solid #6366f1", // Top border red
-          borderRight: "10px solid #818cf8", // Right border green
-          borderBottom: "8px solid #a5b4fc", // Bottom border blue
-          borderLeft: "15px solid #4f46e5", // Left border purple
+          borderTop: "13px solid #6366f1",
+          borderRight: "10px solid #818cf8",
+          borderBottom: "8px solid #a5b4fc",
+          borderLeft: "15px solid #4f46e5",
         }}
       >
-        <h1 className="text-4xl font-bold text-indigo-200 text-center mb-6">
-          Referred Video Object Segmentation
-        </h1>
+        <a
+          href="http://172.26.32.243:5000/" // Change this URL to your desired link
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <h1 className="text-4xl font-bold text-indigo-200 text-center mb-6">
+            Referred Video Object Segmentation
+          </h1>
+        </a>
 
         <div className="flex flex-col items-center mb-6">
           {/* Text Input */}
